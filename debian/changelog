@@ -1,6 +1,7 @@
 python-oslo.utils (0.3.0-1) experimental; urgency=medium
 
   * New upstream release.
+  * Fixed new (build-)depends for this release.
 
  -- Thomas Goirand <zigo@debian.org>  Wed, 17 Sep 2014 12:20:48 +0800
 
