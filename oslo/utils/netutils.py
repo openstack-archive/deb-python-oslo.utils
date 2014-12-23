@@ -20,8 +20,11 @@ Network-related utilities and helper functions.
 import logging
 import socket
 
+import netaddr
+import netifaces
 from six.moves.urllib import parse
 
+from oslo.utils._i18n import _LI
 from oslo.utils._i18n import _LW
 
 LOG = logging.getLogger(__name__)
@@ -75,6 +78,73 @@ def parse_host_port(address, default_port=None):
     return (host, None if port is None else int(port))
 
 
+def is_valid_ipv4(address):
+    """Verify that address represents a valid IPv4 address.
+
+    :param address: Value to verify
+    :type address: string
+    :returns: bool
+    """
+    try:
+        return netaddr.valid_ipv4(address)
+    except Exception:
+        return False
+
+
+def is_valid_ipv6(address):
+    """Verify that address represents a valid IPv6 address.
+
+    :param address: Value to verify
+    :type address: string
+    :returns: bool
+    """
+    try:
+        return netaddr.valid_ipv6(address)
+    except Exception:
+        return False
+
+
+def is_valid_ip(address):
+    """Verify that address represents a valid IP address.
+
+    :param address: Value to verify
+    :type address: string
+    :returns: bool
+    """
+    return is_valid_ipv4(address) or is_valid_ipv6(address)
+
+
+def get_my_ipv4():
+    """Returns the actual ipv4 of the local machine.
+
+    This code figures out what source address would be used if some traffic
+    were to be sent out to some well known address on the Internet. In this
+    case, IP from RFC5737 is used, but the specific address does not
+    matter much. No traffic is actually sent.
+    """
+    try:
+        csock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        csock.connect(('192.0.2.0', 80))
+        (addr, port) = csock.getsockname()
+        csock.close()
+        return addr
+    except socket.error:
+        return _get_my_ipv4_address()
+
+
+def _get_my_ipv4_address():
+    """Figure out the best ipv4
+    """
+    LOCALHOST = '127.0.0.1'
+    gtw = netifaces.gateways()
+    try:
+        interface = gtw['default'][netifaces.AF_INET][1]
+        return netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']
+    except Exception:
+        LOG.info(_LI("Couldn't get IPv4"))
+    return LOCALHOST
+
+
 class _ModifiedSplitResult(parse.SplitResult):
     """Split results class for urlsplit."""
 
@@ -91,6 +161,37 @@ class _ModifiedSplitResult(parse.SplitResult):
         netloc = self.netloc.split('@', 1)[-1]
         host, port = parse_host_port(netloc)
         return port
+
+    def params(self, collapse=True):
+        """Extracts the query parameters from the split urls components.
+
+        This method will provide back as a dictionary the query parameter
+        names and values that were provided in the url.
+
+        :param collapse: Boolean, turn on or off collapsing of query values
+        with the same name. Since a url can contain the same query parameter
+        name with different values it may or may not be useful for users to
+        care that this has happened. This parameter when True uses the
+        last value that was given for a given name, while if False it will
+        retain all values provided by associating the query parameter name with
+        a list of values instead of a single (non-list) value.
+        """
+        if self.query:
+            if collapse:
+                return dict(parse.parse_qsl(self.query))
+            else:
+                params = {}
+                for (key, value) in parse.parse_qsl(self.query):
+                    if key in params:
+                        if isinstance(params[key], list):
+                            params[key].append(value)
+                        else:
+                            params[key] = [params[key], value]
+                    else:
+                        params[key] = value
+                return params
+        else:
+            return {}
 
 
 def urlsplit(url, scheme='', allow_fragments=True):

@@ -16,6 +16,8 @@
 import socket
 
 import mock
+from mock import patch
+import netifaces
 from oslotest import base as test_base
 
 from oslo.utils import netutils
@@ -103,6 +105,25 @@ class NetworkUtilsTest(test_base.BaseTestCase):
         self.assertEqual(result.query, 'ab')
         self.assertEqual(result.fragment, '12')
 
+    def test_urlsplit_params(self):
+        test_url = "http://localhost/?a=b&c=d"
+        result = netutils.urlsplit(test_url)
+        self.assertEqual({'a': 'b', 'c': 'd'}, result.params())
+        self.assertEqual({'a': 'b', 'c': 'd'}, result.params(collapse=False))
+
+        test_url = "http://localhost/?a=b&a=c&a=d"
+        result = netutils.urlsplit(test_url)
+        self.assertEqual({'a': 'd'}, result.params())
+        self.assertEqual({'a': ['b', 'c', 'd']}, result.params(collapse=False))
+
+        test_url = "http://localhost"
+        result = netutils.urlsplit(test_url)
+        self.assertEqual({}, result.params())
+
+        test_url = "http://localhost?"
+        result = netutils.urlsplit(test_url)
+        self.assertEqual({}, result.params())
+
     def test_set_tcp_keepalive(self):
         mock_sock = mock.Mock()
         netutils.set_tcp_keepalive(mock_sock, True, 100, 10, 5)
@@ -130,3 +151,62 @@ class NetworkUtilsTest(test_base.BaseTestCase):
         mock_sock.reset_mock()
         netutils.set_tcp_keepalive(mock_sock, False)
         self.assertEqual(1, len(mock_sock.mock_calls))
+
+    def test_is_valid_ipv4(self):
+        self.assertTrue(netutils.is_valid_ipv4('42.42.42.42'))
+
+        self.assertFalse(netutils.is_valid_ipv4('-1.11.11.11'))
+
+        self.assertFalse(netutils.is_valid_ipv4(''))
+
+    def test_is_valid_ipv6(self):
+        self.assertTrue(netutils.is_valid_ipv6('::1'))
+
+        self.assertFalse(netutils.is_valid_ipv6(
+            '1fff::a88:85a3::172.31.128.1'))
+
+        self.assertFalse(netutils.is_valid_ipv6(''))
+
+    def test_is_valid_ip(self):
+        self.assertTrue(netutils.is_valid_ip('127.0.0.1'))
+
+        self.assertTrue(netutils.is_valid_ip('2001:db8::ff00:42:8329'))
+
+        self.assertFalse(netutils.is_valid_ip('256.0.0.0'))
+
+        self.assertFalse(netutils.is_valid_ip('::1.2.3.'))
+
+        self.assertFalse(netutils.is_valid_ip(''))
+
+    def test_get_my_ip(self):
+        sock_attrs = {
+            'return_value.getsockname.return_value': ['1.2.3.4', '']}
+        with mock.patch('socket.socket', **sock_attrs):
+            addr = netutils.get_my_ipv4()
+        self.assertEqual(addr, '1.2.3.4')
+
+    @mock.patch('socket.socket')
+    @mock.patch('oslo.utils.netutils._get_my_ipv4_address')
+    def test_get_my_ip_socket_error(self, ip, mock_socket):
+        mock_socket.side_effect = socket.error
+        ip.return_value = '1.2.3.4'
+        addr = netutils.get_my_ipv4()
+        self.assertEqual(addr, '1.2.3.4')
+
+    @mock.patch('netifaces.gateways')
+    @mock.patch('netifaces.ifaddresses')
+    def test_get_my_ipv4_address_with_default_route(
+            self, ifaddr, gateways):
+        with patch.dict(netifaces.__dict__, {'AF_INET': '0'}):
+            ifaddr.return_value = {'0': [{'addr': '172.18.204.1'}]}
+            addr = netutils._get_my_ipv4_address()
+        self.assertEqual('172.18.204.1', addr)
+
+    @mock.patch('netifaces.gateways')
+    @mock.patch('netifaces.ifaddresses')
+    def test_get_my_ipv4_address_without_default_route(
+            self, ifaddr, gateways):
+        with patch.dict(netifaces.__dict__, {'AF_INET': '0'}):
+            ifaddr.return_value = {}
+            addr = netutils._get_my_ipv4_address()
+        self.assertEqual('127.0.0.1', addr)

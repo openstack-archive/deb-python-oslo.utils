@@ -51,7 +51,8 @@ SLUGIFY_HYPHENATE_RE = re.compile(r"[-\s]+")
 
 
 # NOTE(flaper87): The following globals are used by `mask_password`
-_SANITIZE_KEYS = ['adminPass', 'admin_pass', 'password', 'admin_password']
+_SANITIZE_KEYS = ['adminPass', 'admin_pass', 'password', 'admin_password',
+                  'auth_token', 'new_pass', 'auth_password']
 
 # NOTE(ldbragst): Let's build a list of regex objects using the list of
 # _SANITIZE_KEYS we already have. This way, we only have to add the new key
@@ -221,7 +222,13 @@ def mask_password(message, secret="***"):
     >>> mask_password("u'original_password' :   u'aaaaa'")
     "u'original_password' :   u'***'"
     """
-    message = six.text_type(message)
+
+    try:
+        message = six.text_type(message)
+    except UnicodeDecodeError:
+        # NOTE(jecarey): Temporary fix to handle cases where message is a
+        # byte string. A better solution will be provided in Kilo.
+        pass
 
     # NOTE(ldbragst): Check to see if anything in message contains any key
     # specified in _SANITIZE_KEYS, if not then just return the message since
@@ -238,3 +245,16 @@ def mask_password(message, secret="***"):
         message = re.sub(pattern, substitute, message)
 
     return message
+
+
+def is_int_like(val):
+    """Check if a value looks like an integer with base 10.
+
+    :param val: Value to verify
+    :type val: string
+    :returns: bool
+    """
+    try:
+        return six.text_type(int(val)) == six.text_type(val)
+    except (TypeError, ValueError):
+        return False
