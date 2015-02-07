@@ -17,7 +17,7 @@ import uuid
 
 from oslotest import base as test_base
 
-from oslo.utils import uuidutils
+from oslo_utils import uuidutils
 
 
 class UUIDUtilsTest(test_base.BaseTestCase):
