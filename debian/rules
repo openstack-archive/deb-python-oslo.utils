@@ -23,7 +23,7 @@ override_dh_install:
 			--root $(CURDIR)/debian/python3-oslo.utils; \
 	done
 	mkdir -p $(CURDIR)/debian/python3-oslo.utils/usr/lib/python3/dist-packages/oslo
-	cp -rfv oslo/utils $(CURDIR)/debian/python-oslo.utils/usr/lib/python3/dist-packages/oslo
+	cp -rfv oslo/utils $(CURDIR)/debian/python3-oslo.utils/usr/lib/python3/dist-packages/oslo
 	rm -f $(CURDIR)/debian/python*-oslo.utils/usr/lib/python*/dist-packages/*.pth
 
 override_dh_auto_test:
