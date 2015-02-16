@@ -2,6 +2,8 @@ python-oslo.utils (1.2.1-1) experimental; urgency=medium
 
   * New upstream release.
   * Reviewed (build-)depends.
+  * Added patch of .testr.conf to not list ./tests unit tests, which are using
+    the oslo. namespace (and then, failing in Python 3).
 
  -- Thomas Goirand <zigo@debian.org>  Tue, 23 Dec 2014 13:06:27 +0800
 
