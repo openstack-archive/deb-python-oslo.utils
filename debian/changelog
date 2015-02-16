@@ -1,4 +1,4 @@
-python-oslo.utils (1.2.1-1) UNRELEASED; urgency=medium
+python-oslo.utils (1.2.1-1) experimental; urgency=medium
 
   * New upstream release.
   * Reviewed (build-)depends.
