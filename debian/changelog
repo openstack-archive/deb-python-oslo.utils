@@ -1,9 +1,9 @@
-python-oslo.utils (0.2.0-1) experimental; urgency=medium
+python-oslo.utils (0.2.0-1) unstable; urgency=high
 
-  * New upstream release.
-  * Uploading to experimental before Jessie's freeze.
+  * New upstream release fixing CVE-2014-7231.
+  * Uploading to unstable after pre-approval by the release team.
 
- -- Thomas Goirand <zigo@debian.org>  Fri, 05 Sep 2014 15:50:43 +0800
+ -- Thomas Goirand <zigo@debian.org>  Tue, 17 Feb 2015 14:26:30 +0000
 
 python-oslo.utils (0.1.1-1) unstable; urgency=medium
 
