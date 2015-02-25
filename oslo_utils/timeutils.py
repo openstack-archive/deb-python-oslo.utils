@@ -93,18 +93,35 @@ def is_newer_than(after, seconds):
     return after - utcnow() > datetime.timedelta(seconds=seconds)
 
 
-def utcnow_ts():
-    """Timestamp version of our utcnow function."""
+def utcnow_ts(microsecond=False):
+    """Timestamp version of our utcnow function.
+
+    See :py:class:`oslo_utils.fixture.TimeFixture`.
+
+    """
     if utcnow.override_time is None:
         # NOTE(kgriffs): This is several times faster
         # than going through calendar.timegm(...)
-        return int(time.time())
+        timestamp = time.time()
+        if not microsecond:
+            timestamp = int(timestamp)
+        return timestamp
 
-    return calendar.timegm(utcnow().timetuple())
+    now = utcnow()
+    timestamp = calendar.timegm(now.timetuple())
+
+    if microsecond:
+        timestamp += float(now.microsecond) / 1000000
+
+    return timestamp
 
 
 def utcnow():
-    """Overridable version of utils.utcnow."""
+    """Overridable version of utils.utcnow.
+
+    See :py:class:`oslo_utils.fixture.TimeFixture`.
+
+    """
     if utcnow.override_time:
         try:
             return utcnow.override_time.pop(0)
@@ -113,9 +130,9 @@ def utcnow():
     return datetime.datetime.utcnow()
 
 
-def iso8601_from_timestamp(timestamp):
+def iso8601_from_timestamp(timestamp, microsecond=False):
     """Returns an iso8601 formatted date from timestamp."""
-    return isotime(datetime.datetime.utcfromtimestamp(timestamp))
+    return isotime(datetime.datetime.utcfromtimestamp(timestamp), microsecond)
 
 
 utcnow.override_time = None
@@ -126,6 +143,8 @@ def set_time_override(override_time=None):
 
     Make it return a constant time or a list thereof, one at a time.
 
+    See :py:class:`oslo_utils.fixture.TimeFixture`.
+
     :param override_time: datetime instance or list thereof. If not
                           given, defaults to the current UTC time.
     """
@@ -133,7 +152,11 @@ def set_time_override(override_time=None):
 
 
 def advance_time_delta(timedelta):
-    """Advance overridden time using a datetime.timedelta."""
+    """Advance overridden time using a datetime.timedelta.
+
+    See :py:class:`oslo_utils.fixture.TimeFixture`.
+
+    """
     assert utcnow.override_time is not None
     try:
         for dt in utcnow.override_time:
@@ -143,12 +166,20 @@ def advance_time_delta(timedelta):
 
 
 def advance_time_seconds(seconds):
-    """Advance overridden time by seconds."""
+    """Advance overridden time by seconds.
+
+    See :py:class:`oslo_utils.fixture.TimeFixture`.
+
+    """
     advance_time_delta(datetime.timedelta(0, seconds))
 
 
 def clear_time_override():
-    """Remove the overridden time."""
+    """Remove the overridden time.
+
+    See :py:class:`oslo_utils.fixture.TimeFixture`.
+
+    """
     utcnow.override_time = None
 
 
