@@ -1,4 +1,4 @@
-python-oslo.utils (1.7.0-1) UNRELEASED; urgency=medium
+python-oslo.utils (1.6.0-1) UNRELEASED; urgency=medium
 
   * New upstream release:
     - d/control: Align dependencies and version requirements with upstream.
