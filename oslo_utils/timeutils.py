@@ -21,7 +21,9 @@ import calendar
 import datetime
 import time
 
+from debtcollector import removals
 import iso8601
+from pytz import timezone
 import six
 
 from oslo_utils import reflection
@@ -30,6 +32,8 @@ from oslo_utils import reflection
 _ISO8601_TIME_FORMAT_SUBSECOND = '%Y-%m-%dT%H:%M:%S.%f'
 _ISO8601_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
 PERFECT_TIME_FORMAT = _ISO8601_TIME_FORMAT_SUBSECOND
+
+_MAX_DATETIME_SEC = 59
 
 # Use monotonic time in stopwatches if we can get at it...
 #
@@ -45,8 +49,17 @@ except AttributeError:
         now = time.time
 
 
+@removals.remove(
+    message="use datetime.datetime.isoformat()",
+    version="1.6",
+    removal_version="?",
+    )
 def isotime(at=None, subsecond=False):
-    """Stringify time in ISO 8601 format."""
+    """Stringify time in ISO 8601 format.
+
+    .. deprecated:: > 1.5.0
+       Use :func:`utcnow` and :func:`datetime.datetime.isoformat` instead.
+    """
     if not at:
         at = utcnow()
     st = at.strftime(_ISO8601_TIME_FORMAT
@@ -130,8 +143,8 @@ def utcnow_ts(microsecond=False):
     return timestamp
 
 
-def utcnow():
-    """Overridable version of utils.utcnow.
+def utcnow(with_timezone=False):
+    """Overridable version of utils.utcnow that can return a TZ-aware datetime.
 
     See :py:class:`oslo_utils.fixture.TimeFixture`.
 
@@ -141,11 +154,23 @@ def utcnow():
             return utcnow.override_time.pop(0)
         except AttributeError:
             return utcnow.override_time
+    if with_timezone:
+        return datetime.datetime.now(tz=iso8601.iso8601.UTC)
     return datetime.datetime.utcnow()
 
 
+@removals.remove(
+    message="use datetime.datetime.utcfromtimestamp().isoformat()",
+    version="1.6",
+    removal_version="?",
+    )
 def iso8601_from_timestamp(timestamp, microsecond=False):
-    """Returns an iso8601 formatted date from timestamp."""
+    """Returns an iso8601 formatted date from timestamp.
+
+    .. deprecated:: > 1.5.0
+       Use :func:`datetime.datetime.utcfromtimestamp` and
+       :func:`datetime.datetime.isoformat` instead.
+    """
     return isotime(datetime.datetime.utcfromtimestamp(timestamp), microsecond)
 
 
@@ -198,26 +223,36 @@ def clear_time_override():
 
 
 def marshall_now(now=None):
-    """Make an rpc-safe datetime with microseconds.
-
-    Note: tzinfo is stripped, but not required for relative times.
-    """
+    """Make an rpc-safe datetime with microseconds."""
     if not now:
         now = utcnow()
-    return dict(day=now.day, month=now.month, year=now.year, hour=now.hour,
-                minute=now.minute, second=now.second,
-                microsecond=now.microsecond)
+    d = dict(day=now.day, month=now.month, year=now.year, hour=now.hour,
+             minute=now.minute, second=now.second,
+             microsecond=now.microsecond)
+    if now.tzinfo:
+        d['tzname'] = now.tzinfo.tzname(None)
+    return d
 
 
 def unmarshall_time(tyme):
     """Unmarshall a datetime dict."""
-    return datetime.datetime(day=tyme['day'],
-                             month=tyme['month'],
-                             year=tyme['year'],
-                             hour=tyme['hour'],
-                             minute=tyme['minute'],
-                             second=tyme['second'],
-                             microsecond=tyme['microsecond'])
+
+    # NOTE(ihrachys): datetime does not support leap seconds,
+    # so the best thing we can do for now is dropping them
+    # http://bugs.python.org/issue23574
+    second = min(tyme['second'], _MAX_DATETIME_SEC)
+    dt = datetime.datetime(day=tyme['day'],
+                           month=tyme['month'],
+                           year=tyme['year'],
+                           hour=tyme['hour'],
+                           minute=tyme['minute'],
+                           second=second,
+                           microsecond=tyme['microsecond'])
+    tzname = tyme.get('tzname')
+    if tzname:
+        tzinfo = timezone(tzname)
+        dt = tzinfo.localize(dt)
+    return dt
 
 
 def delta_seconds(before, after):
@@ -292,6 +327,12 @@ class StopWatch(object):
     the same time). Thread-safe when used by a single thread (not shared) or
     when operations are performed in a thread-safe manner on these objects by
     wrapping those operations with locks.
+
+    It will try to use ``time.monotonic`` and then attempt to use the
+    `monotonic`_ pypi library and then fallback to using the non-monotonic
+    ``time.time``.
+
+    .. _monotonic: https://pypi.python.org/pypi/monotonic/
     """
     _STARTED = 'STARTED'
     _STOPPED = 'STOPPED'
