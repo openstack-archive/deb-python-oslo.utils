@@ -6,6 +6,7 @@ Uploaders: Julien Danjou <acid@debian.org>,
            Thomas Goirand <zigo@debian.org>,
            Mehdi Abaakouk <sileht@sileht.net>,
            Gonéri Le Bouder <goneri@debian.org>,
+           ,
 Build-Depends: debhelper (>= 9),
                dh-python,
                openstack-pkg-tools,
@@ -79,6 +80,8 @@ Depends: python-babel,
          python-six (>= 1.9.0),
          ${misc:Depends},
          ${python:Depends},
+Breaks: python-oslo-utils (<< 1.6.0-1~),
+Replaces: python-oslo-utils (<< 1.6.0-1~),
 Description: set of utility functions for OpenStack - Python 2.x
  The Oslo.utils package provides a set of function which are cross-project
  for OpenStack. For example, it provides text decoding, exception handling,
@@ -100,6 +103,8 @@ Depends: python3-babel,
          python3-six (>= 1.9.0),
          ${misc:Depends},
          ${python3:Depends},
+Breaks: python3-oslo-utils (<< 1.6.0-1~),
+Replaces: python3-oslo-utils (<< 1.6.0-1~),
 Description: set of utility functions for OpenStack - Python 3.x
  The Oslo.utils package provides a set of function which are cross-project
  for OpenStack. For example, it provides text decoding, exception handling,
@@ -121,3 +126,27 @@ Description: Oslo Utility library - doc
  system-level, and time utilities and helper functions.
  .
   This package contains the documentation.
+
+Package: python-oslo-utils
+Section: oldlibs
+Architecture: all
+Depends: python-oslo.utils,
+         ${misc:Depends},
+Description: transitional dummy package for python-oslo-utils.
+ This transtional package is safe to remove.
+
+Package: python-oslo-utils-doc
+Section: oldlibs
+Architecture: all
+Depends: python-oslo.utils-doc,
+         ${misc:Depends},
+Description: transitional dummy package for python-oslo-utils-doc.
+ This transtional package is safe to remove.
+
+Package: python3-oslo-utils
+Section: oldlibs
+Architecture: all
+Depends: python3-oslo.utils,
+         ${misc:Depends},
+Description: transitional dummy package for python3-oslo-utils.
+ This transtional package is safe to remove.

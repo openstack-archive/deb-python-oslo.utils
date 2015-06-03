@@ -4,6 +4,9 @@ python-oslo.utils (1.6.0-1) UNRELEASED; urgency=medium
     - d/control: Align dependencies and version requirements with upstream.
     - d/control: Drop Build-Conflicts on python{3}-oslo.utils, no longer
       needed.
+  * Re-align with Ubuntu:
+    - d/control: Add Breaks/Replaces for Ubuntu *oslo-utils packages.
+    - d/control: Add transitional packages for *oslo-utils.
 
  -- James Page <james.page@ubuntu.com>  Tue, 02 Jun 2015 17:43:04 +0100
 
