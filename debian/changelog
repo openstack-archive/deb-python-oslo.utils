@@ -2,6 +2,7 @@ python-oslo.utils (1.6.0-2) experimental; urgency=medium
 
   * Team upload.
   * d/control: Remove errant , from Uploaders field.
+  * d/watch: Update to use Debian pypi redirector.
 
  -- James Page <james.page@ubuntu.com>  Mon, 15 Jun 2015 08:43:09 +0100
 
