@@ -12,13 +12,13 @@ export OSLO_PACKAGE_VERSION=$(VERSION)
 	dh $@ --buildsystem=python_distutils --with python2,python3,sphinxdoc
 
 override_dh_install:
-	set -e && for pyvers in $(PYTHONS); do \
+	set -e ; for pyvers in $(PYTHONS); do \
 		python$$pyvers setup.py install --install-layout=deb \
 			--root $(CURDIR)/debian/python-oslo.utils; \
 		mkdir -p $(CURDIR)/debian/python-oslo.utils/usr/lib/python$$pyvers/dist-packages/oslo ; \
 		cp -rfv oslo/utils $(CURDIR)/debian/python-oslo.utils/usr/lib/python$$pyvers/dist-packages/oslo ; \
 	done
-	set -e && for pyvers in $(PYTHON3S); do \
+	set -e ; for pyvers in $(PYTHON3S); do \
 		python$$pyvers setup.py install --install-layout=deb \
 			--root $(CURDIR)/debian/python3-oslo.utils; \
 	done
