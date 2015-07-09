@@ -1,6 +1,10 @@
 python-oslo.utils (1.6.0-3) UNRELEASED; urgency=medium
 
+  [ Thomas Goirand ]
   * Fixed && -> ; in debian/rules.
+
+  [ James Page ]
+  * Fixup typo in transitional package description (LP: #1471561).
 
  -- Thomas Goirand <zigo@debian.org>  Tue, 23 Jun 2015 23:45:52 +0200
 
