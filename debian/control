@@ -118,6 +118,7 @@ Description: Oslo Utility library - doc
 
 Package: python-oslo-utils
 Section: oldlibs
+Priority: extra
 Architecture: all
 Depends: python-oslo.utils,
          ${misc:Depends},
@@ -126,6 +127,7 @@ Description: transitional dummy package for python-oslo-utils
 
 Package: python-oslo-utils-doc
 Section: oldlibs
+Priority: extra
 Architecture: all
 Depends: python-oslo.utils-doc,
          ${misc:Depends},
@@ -134,6 +136,7 @@ Description: transitional dummy package for python-oslo-utils-doc
 
 Package: python3-oslo-utils
 Section: oldlibs
+Priority: extra
 Architecture: all
 Depends: python3-oslo.utils,
          ${misc:Depends},
