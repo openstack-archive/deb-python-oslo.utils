@@ -23,6 +23,13 @@ import time
 
 from debtcollector import removals
 import iso8601
+try:
+    from monotonic import monotonic as now  # noqa
+except RuntimeError:
+    try:
+        now = time.monotonic
+    except AttributeError:
+        now = time.time
 from pytz import timezone
 import six
 
@@ -34,19 +41,6 @@ _ISO8601_TIME_FORMAT = '%Y-%m-%dT%H:%M:%S'
 PERFECT_TIME_FORMAT = _ISO8601_TIME_FORMAT_SUBSECOND
 
 _MAX_DATETIME_SEC = 59
-
-# Use monotonic time in stopwatches if we can get at it...
-#
-# PEP @ https://www.python.org/dev/peps/pep-0418/
-try:
-    now = time.monotonic
-except AttributeError:
-    try:
-        # Try to use the pypi module if it's available (optionally...)
-        from monotonic import monotonic as now
-    except (AttributeError, ImportError):
-        # Ok fallback to the non-monotonic one...
-        now = time.time
 
 
 @removals.remove(
@@ -80,8 +74,24 @@ def parse_isotime(timestr):
         raise ValueError(six.text_type(e))
 
 
+@removals.remove(
+    message="use either datetime.datetime.isoformat() "
+    "or datetime.datetime.strftime() instead",
+    version="1.6",
+    removal_version="?",
+    )
 def strtime(at=None, fmt=PERFECT_TIME_FORMAT):
-    """Returns formatted utcnow."""
+    """Returns formatted utcnow.
+
+    .. deprecated:: > 1.5.0
+       Use :func:`utcnow()`, :func:`datetime.datetime.isoformat`
+       or :func:`datetime.strftime` instead.
+
+       strtime() => utcnow().isoformat()
+       strtime(fmt=...) => utcnow().strftime(fmt)
+       strtime(at) => at.isoformat()
+       strtime(at, fmt) => at.strftime(fmt)
+    """
     if not at:
         at = utcnow()
     return at.strftime(fmt)
@@ -103,9 +113,9 @@ def normalize_time(timestamp):
 def is_older_than(before, seconds):
     """Return True if before is older than seconds."""
     if isinstance(before, six.string_types):
-        before = parse_strtime(before).replace(tzinfo=None)
-    else:
-        before = before.replace(tzinfo=None)
+        before = parse_isotime(before)
+
+    before = normalize_time(before)
 
     return utcnow() - before > datetime.timedelta(seconds=seconds)
 
@@ -113,9 +123,9 @@ def is_older_than(before, seconds):
 def is_newer_than(after, seconds):
     """Return True if after is newer than seconds."""
     if isinstance(after, six.string_types):
-        after = parse_strtime(after).replace(tzinfo=None)
-    else:
-        after = after.replace(tzinfo=None)
+        after = parse_isotime(after)
+
+    after = normalize_time(after)
 
     return after - utcnow() > datetime.timedelta(seconds=seconds)
 
