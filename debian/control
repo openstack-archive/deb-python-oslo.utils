@@ -121,7 +121,7 @@ Section: oldlibs
 Architecture: all
 Depends: python-oslo.utils,
          ${misc:Depends},
-Description: transitional dummy package for python-oslo-utils.
+Description: transitional dummy package for python-oslo-utils
  This transitional package is safe to remove.
 
 Package: python-oslo-utils-doc
@@ -129,7 +129,7 @@ Section: oldlibs
 Architecture: all
 Depends: python-oslo.utils-doc,
          ${misc:Depends},
-Description: transitional dummy package for python-oslo-utils-doc.
+Description: transitional dummy package for python-oslo-utils-doc
  This transitional package is safe to remove.
 
 Package: python3-oslo-utils
@@ -137,5 +137,5 @@ Section: oldlibs
 Architecture: all
 Depends: python3-oslo.utils,
          ${misc:Depends},
-Description: transitional dummy package for python3-oslo-utils.
+Description: transitional dummy package for python3-oslo-utils
  This transitional package is safe to remove.
