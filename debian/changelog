@@ -1,6 +1,7 @@
-python-oslo.utils (1.6.0-3) UNRELEASED; urgency=medium
+python-oslo.utils (2.1.0-1) experimental; urgency=medium
 
   [ Thomas Goirand ]
+  * New upstream release.
   * Fixed && -> ; in debian/rules.
 
   [ James Page ]
