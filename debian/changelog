@@ -4,6 +4,7 @@ python-oslo.utils (2.1.0-1) experimental; urgency=medium
   * New upstream release.
   * Fixed && -> ; in debian/rules.
   * Fixed (build-)depends for this release.
+  * Do not manually copy oslo/utils, as the namespace version is gone.
 
   [ James Page ]
   * Fixup typo in transitional package description (LP: #1471561).

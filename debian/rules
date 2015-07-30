@@ -15,15 +15,11 @@ override_dh_install:
 	set -e ; for pyvers in $(PYTHONS); do \
 		python$$pyvers setup.py install --install-layout=deb \
 			--root $(CURDIR)/debian/python-oslo.utils; \
-		mkdir -p $(CURDIR)/debian/python-oslo.utils/usr/lib/python$$pyvers/dist-packages/oslo ; \
-		cp -rfv oslo/utils $(CURDIR)/debian/python-oslo.utils/usr/lib/python$$pyvers/dist-packages/oslo ; \
 	done
 	set -e ; for pyvers in $(PYTHON3S); do \
 		python$$pyvers setup.py install --install-layout=deb \
 			--root $(CURDIR)/debian/python3-oslo.utils; \
 	done
-	mkdir -p $(CURDIR)/debian/python3-oslo.utils/usr/lib/python3/dist-packages/oslo
-	cp -rfv oslo/utils $(CURDIR)/debian/python3-oslo.utils/usr/lib/python3/dist-packages/oslo
 	rm -f $(CURDIR)/debian/python*-oslo.utils/usr/lib/python*/dist-packages/*.pth
 
 override_dh_auto_test:
