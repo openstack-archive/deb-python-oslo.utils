@@ -3,6 +3,7 @@ python-oslo.utils (2.1.0-1) experimental; urgency=medium
   [ Thomas Goirand ]
   * New upstream release.
   * Fixed && -> ; in debian/rules.
+  * Fixed (build-)depends for this release.
 
   [ James Page ]
   * Fixup typo in transitional package description (LP: #1471561).
