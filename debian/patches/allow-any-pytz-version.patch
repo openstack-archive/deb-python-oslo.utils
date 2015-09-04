@@ -1,14 +1,12 @@
-Description: Allow any pytz version
- Upstream requires a specific version of pytz. We don't want this restriction
- in Debian, the normal pytz package should be ok (it's heavily patched anyway).
+Description: Allow any version of pytz.
+ Debian pytz package (ie: python-tz) is heavily patched and up-to-date, there's
+ no reason why we should require such a high version.
 Author: Thomas Goirand <zigo@debian.org>
 Forwarded: not-needed
 Last-Update: 2015-09-04
 
-Index: python-oslo.utils/requirements.txt
-===================================================================
---- python-oslo.utils.orig/requirements.txt
-+++ python-oslo.utils/requirements.txt
+--- python-oslo.utils-2.4.0.orig/requirements.txt
++++ python-oslo.utils-2.4.0/requirements.txt
 @@ -13,7 +13,7 @@ six>=1.9.0
  iso8601>=0.1.9
  oslo.i18n>=1.5.0 # Apache-2.0
