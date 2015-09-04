@@ -1,5 +1,7 @@
-python-oslo.utils (2.1.0-2) experimental; urgency=medium
+python-oslo.utils (2.1.0-1) experimental; urgency=medium
 
+  * New upstream release.
+  * Fixed (build-)depends for this release.
   * Added a patch to allow any version of pytz.
 
  -- Thomas Goirand <zigo@debian.org>  Fri, 04 Sep 2015 09:58:33 +0000
