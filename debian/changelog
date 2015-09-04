@@ -1,3 +1,9 @@
+python-oslo.utils (2.1.0-2) experimental; urgency=medium
+
+  * Added a patch to allow any version of pytz.
+
+ -- Thomas Goirand <zigo@debian.org>  Fri, 04 Sep 2015 09:58:33 +0000
+
 python-oslo.utils (2.1.0-1) experimental; urgency=medium
 
   [ Thomas Goirand ]
