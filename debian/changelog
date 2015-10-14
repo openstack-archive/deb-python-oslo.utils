@@ -1,3 +1,9 @@
+python-oslo.utils (2.5.0-2) UNRELEASED; urgency=medium
+
+  * Switched from override_dh_install to override_dh_auto_install.
+
+ -- Thomas Goirand <zigo@debian.org>  Wed, 14 Oct 2015 10:34:43 +0200
+
 python-oslo.utils (2.5.0-1) experimental; urgency=medium
 
   * New upstream release.
