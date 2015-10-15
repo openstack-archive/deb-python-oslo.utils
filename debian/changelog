@@ -1,8 +1,9 @@
-python-oslo.utils (2.5.0-2) UNRELEASED; urgency=medium
+python-oslo.utils (2.5.0-2) unstable; urgency=medium
 
+  * Uploading to unstable.
   * Switched from override_dh_install to override_dh_auto_install.
 
- -- Thomas Goirand <zigo@debian.org>  Wed, 14 Oct 2015 10:34:43 +0200
+ -- Thomas Goirand <zigo@debian.org>  Thu, 15 Oct 2015 20:47:59 +0000
 
 python-oslo.utils (2.5.0-1) experimental; urgency=medium
 
