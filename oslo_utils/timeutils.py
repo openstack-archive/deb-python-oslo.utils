@@ -45,7 +45,7 @@ _MAX_DATETIME_SEC = 59
 def isotime(at=None, subsecond=False):
     """Stringify time in ISO 8601 format.
 
-    .. deprecated:: > 1.5.0
+    .. deprecated:: 1.5.0
        Use :func:`utcnow` and :func:`datetime.datetime.isoformat` instead.
     """
     if not at:
@@ -77,14 +77,14 @@ def parse_isotime(timestr):
 def strtime(at=None, fmt=PERFECT_TIME_FORMAT):
     """Returns formatted utcnow.
 
-    .. deprecated:: > 1.5.0
+    .. deprecated:: 1.5.0
        Use :func:`utcnow()`, :func:`datetime.datetime.isoformat`
-       or :func:`datetime.strftime` instead.
+       or :func:`datetime.strftime` instead:
 
-       strtime() => utcnow().isoformat()
-       strtime(fmt=...) => utcnow().strftime(fmt)
-       strtime(at) => at.isoformat()
-       strtime(at, fmt) => at.strftime(fmt)
+       * ``strtime()`` => ``utcnow().isoformat()``
+       * ``strtime(fmt=...)`` => ``utcnow().strftime(fmt)``
+       * ``strtime(at)`` => ``at.isoformat()``
+       * ``strtime(at, fmt)`` => ``at.strftime(fmt)``
     """
     if not at:
         at = utcnow()
@@ -105,7 +105,12 @@ def normalize_time(timestamp):
 
 
 def is_older_than(before, seconds):
-    """Return True if before is older than seconds."""
+    """Return True if before is older than seconds.
+
+    .. versionchanged:: 1.7
+       Accept datetime string with timezone information.
+       Fix comparison with timezone aware datetime.
+    """
     if isinstance(before, six.string_types):
         before = parse_isotime(before)
 
@@ -115,7 +120,12 @@ def is_older_than(before, seconds):
 
 
 def is_newer_than(after, seconds):
-    """Return True if after is newer than seconds."""
+    """Return True if after is newer than seconds.
+
+    .. versionchanged:: 1.7
+       Accept datetime string with timezone information.
+       Fix comparison with timezone aware datetime.
+    """
     if isinstance(after, six.string_types):
         after = parse_isotime(after)
 
@@ -129,6 +139,8 @@ def utcnow_ts(microsecond=False):
 
     See :py:class:`oslo_utils.fixture.TimeFixture`.
 
+    .. versionchanged:: 1.3
+       Added optional *microsecond* parameter.
     """
     if utcnow.override_time is None:
         # NOTE(kgriffs): This is several times faster
@@ -152,6 +164,8 @@ def utcnow(with_timezone=False):
 
     See :py:class:`oslo_utils.fixture.TimeFixture`.
 
+    .. versionchanged:: 1.6
+       Added *with_timezone* parameter.
     """
     if utcnow.override_time:
         try:
@@ -171,7 +185,10 @@ def utcnow(with_timezone=False):
 def iso8601_from_timestamp(timestamp, microsecond=False):
     """Returns an iso8601 formatted date from timestamp.
 
-    .. deprecated:: > 1.5.0
+    .. versionchanged:: 1.3
+       Added optional *microsecond* parameter.
+
+    .. deprecated:: 1.5.0
        Use :func:`datetime.datetime.utcfromtimestamp` and
        :func:`datetime.datetime.isoformat` instead.
     """
@@ -200,7 +217,7 @@ def advance_time_delta(timedelta):
     See :py:class:`oslo_utils.fixture.TimeFixture`.
 
     """
-    assert utcnow.override_time is not None
+    assert utcnow.override_time is not None  # nosec
     try:
         for dt in utcnow.override_time:
             dt += timedelta
@@ -227,7 +244,11 @@ def clear_time_override():
 
 
 def marshall_now(now=None):
-    """Make an rpc-safe datetime with microseconds."""
+    """Make an rpc-safe datetime with microseconds.
+
+    .. versionchanged:: 1.6
+       Timezone information is now serialized instead of being stripped.
+    """
     if not now:
         now = utcnow()
     d = dict(day=now.day, month=now.month, year=now.year, hour=now.hour,
@@ -239,7 +260,14 @@ def marshall_now(now=None):
 
 
 def unmarshall_time(tyme):
-    """Unmarshall a datetime dict."""
+    """Unmarshall a datetime dict.
+
+    .. versionchanged:: 1.5
+       Drop leap second.
+
+    .. versionchanged:: 1.6
+       Added support for timezone information.
+    """
 
     # NOTE(ihrachys): datetime does not support leap seconds,
     # so the best thing we can do for now is dropping them
@@ -298,6 +326,8 @@ class Split(object):
     """A *immutable* stopwatch split.
 
     See: http://en.wikipedia.org/wiki/Stopwatch for what this is/represents.
+
+    .. versionadded:: 1.4
     """
 
     __slots__ = ['_elapsed', '_length']
@@ -332,11 +362,13 @@ class StopWatch(object):
     when operations are performed in a thread-safe manner on these objects by
     wrapping those operations with locks.
 
-    It will try to use ``time.monotonic`` and then attempt to use the
-    `monotonic`_ pypi library and then fallback to using the non-monotonic
-    ``time.time``.
+    It will use the `monotonic`_ pypi library to find an appropriate
+    monotonically increasing time providing function (which typically varies
+    depending on operating system and python version).
 
     .. _monotonic: https://pypi.python.org/pypi/monotonic/
+
+    .. versionadded:: 1.4
     """
     _STARTED = 'STARTED'
     _STOPPED = 'STOPPED'
@@ -418,7 +450,7 @@ class StopWatch(object):
         """Stops the watch (ignoring errors if stop fails)."""
         try:
             self.stop()
-        except RuntimeError:
+        except RuntimeError:  # nosec: errors are meant to be ignored
             pass
 
     def leftover(self, return_none=False):

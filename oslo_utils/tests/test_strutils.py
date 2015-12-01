@@ -30,6 +30,12 @@ load_tests = testscenarios.load_tests_apply_scenarios
 
 class StrUtilsTest(test_base.BaseTestCase):
 
+    @mock.patch("six.text_type")
+    def test_bool_bool_from_string_no_text(self, mock_text):
+        self.assertTrue(strutils.bool_from_string(True))
+        self.assertFalse(strutils.bool_from_string(False))
+        self.assertEqual(0, mock_text.call_count)
+
     def test_bool_bool_from_string(self):
         self.assertTrue(strutils.bool_from_string(True))
         self.assertFalse(strutils.bool_from_string(False))
@@ -312,6 +318,14 @@ class MaskPasswordTestCase(test_base.BaseTestCase):
         payload = """{ 'secret_uuid' : 'myuuid' }"""
         expected = """{ 'secret_uuid' : '***' }"""
         self.assertEqual(expected, strutils.mask_password(payload))
+        # Test 'token' w/o spaces
+        payload = """{'token':'token'}"""
+        expected = """{'token':'***'}"""
+        self.assertEqual(expected, strutils.mask_password(payload))
+        # Test 'token' with spaces
+        payload = """{ 'token' : 'token' }"""
+        expected = """{ 'token' : '***' }"""
+        self.assertEqual(expected, strutils.mask_password(payload))
 
     def test_xml(self):
         # Test 'adminPass' w/o spaces
@@ -529,6 +543,11 @@ class MaskPasswordTestCase(test_base.BaseTestCase):
         payload = """{'adminPass':'mypassword'}"""
         payload = six.text_type(payload)
         expected = """{'adminPass':'***'}"""
+        self.assertEqual(expected, strutils.mask_password(payload))
+
+        payload = """{'token':'mytoken'}"""
+        payload = six.text_type(payload)
+        expected = """{'token':'***'}"""
         self.assertEqual(expected, strutils.mask_password(payload))
 
         payload = ("test = 'node.session.auth.password','-v','mypassword',"

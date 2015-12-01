@@ -14,6 +14,12 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+"""
+Reflection module.
+
+.. versionadded:: 1.1
+"""
+
 import inspect
 import types
 
@@ -31,7 +37,10 @@ _BUILTIN_MODULES = ('builtins', '__builtin__', '__builtins__', 'exceptions')
 
 
 def get_members(obj, exclude_hidden=True):
-    """Yields the members of an object, filtering by hidden/not hidden."""
+    """Yields the members of an object, filtering by hidden/not hidden.
+
+    .. versionadded:: 2.3
+    """
     for (name, value) in inspect.getmembers(obj):
         if name.startswith("_") and exclude_hidden:
             continue
@@ -55,25 +64,16 @@ def get_class_name(obj, fully_qualified=True):
         obj = type(obj)
     try:
         built_in = obj.__module__ in _BUILTIN_MODULES
-    except AttributeError:
+    except AttributeError:  # nosec
         pass
     else:
         if built_in:
-            try:
-                return obj.__qualname__
-            except AttributeError:
-                return obj.__name__
-    pieces = []
-    try:
-        pieces.append(obj.__qualname__)
-    except AttributeError:
-        pieces.append(obj.__name__)
-    if fully_qualified:
-        try:
-            pieces.insert(0, obj.__module__)
-        except AttributeError:
-            pass
-    return '.'.join(pieces)
+            return obj.__name__
+
+    if fully_qualified and hasattr(obj, '__module__'):
+        return '%s.%s' % (obj.__module__, obj.__name__)
+    else:
+        return obj.__name__
 
 
 def get_all_class_names(obj, up_to=object):
@@ -158,14 +158,14 @@ def is_same_callback(callback1, callback2, strict=True):
             self1 = six.get_method_self(callback1)
             self2 = six.get_method_self(callback2)
             return self1 is self2
-        except AttributeError:
+        except AttributeError:  # nosec
             pass
     return False
 
 
 def is_bound_method(method):
     """Returns if the given method is bound to an object."""
-    return bool(get_method_self(method))
+    return get_method_self(method) is not None
 
 
 def is_subclass(obj, cls):

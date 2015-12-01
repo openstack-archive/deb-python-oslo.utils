@@ -53,7 +53,7 @@ SLUGIFY_HYPHENATE_RE = re.compile(r"[-\s]+")
 # NOTE(flaper87): The following globals are used by `mask_password`
 _SANITIZE_KEYS = ['adminPass', 'admin_pass', 'password', 'admin_password',
                   'auth_token', 'new_pass', 'auth_password', 'secret_uuid',
-                  'sys_pswd']
+                  'secret', 'sys_pswd', 'token']
 
 # NOTE(ldbragst): Let's build a list of regex objects using the list of
 # _SANITIZE_KEYS we already have. This way, we only have to add the new key
@@ -119,6 +119,8 @@ def bool_from_string(subject, strict=False, default=False):
     ValueError which is useful when parsing values passed in from an API call.
     Strings yielding False are 'f', 'false', 'off', 'n', 'no', or '0'.
     """
+    if isinstance(subject, bool):
+        return subject
     if not isinstance(subject, six.string_types):
         subject = six.text_type(subject)
 
@@ -210,8 +212,8 @@ def to_slug(value, incoming=None, errors="strict"):
     return SLUGIFY_HYPHENATE_RE.sub("-", value)
 
 
-def mask_password(message, secret="***"):
-    """Replace password with 'secret' in message.
+def mask_password(message, secret="***"):  # nosec
+    """Replace password with *secret* in message.
 
     :param message: The string which includes security information.
     :param secret: value with which to replace passwords.
@@ -229,11 +231,29 @@ def mask_password(message, secret="***"):
     "'original_password' : '***'"
     >>> mask_password("u'original_password' :   u'aaaaa'")
     "u'original_password' :   u'***'"
+
+    .. versionadded:: 0.2
+
+    .. versionchanged:: 1.1
+       Replace also ``'auth_token'``, ``'new_pass'`` and ``'auth_password'``
+       keys.
+
+    .. versionchanged:: 1.1.1
+       Replace also ``'secret_uuid'`` key.
+
+    .. versionchanged:: 1.5
+       Replace also ``'sys_pswd'`` key.
+
+    .. versionchanged:: 2.6
+       Replace also ``'token'`` key.
+
+    .. versionchanged:: 2.7
+       Replace also ``'secret'`` key.
     """
 
     try:
         message = six.text_type(message)
-    except UnicodeDecodeError:
+    except UnicodeDecodeError:  # nosec
         # NOTE(jecarey): Temporary fix to handle cases where message is a
         # byte string. A better solution will be provided in Kilo.
         pass
@@ -260,6 +280,8 @@ def is_int_like(val):
     :param val: Value to verify
     :type val: string
     :returns: bool
+
+    .. versionadded:: 1.1
     """
     try:
         return six.text_type(int(val)) == six.text_type(val)

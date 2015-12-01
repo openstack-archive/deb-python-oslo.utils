@@ -26,7 +26,9 @@ import traceback
 import six
 
 from oslo_utils._i18n import _LE
+from oslo_utils import encodeutils
 from oslo_utils import reflection
+from oslo_utils import timeutils
 
 
 class CausedByException(Exception):
@@ -43,6 +45,8 @@ class CausedByException(Exception):
                   should itself be an exception instance, this is useful for
                   creating a chain of exceptions for versions of python where
                   this is not yet implemented/supported natively.
+
+    .. versionadded:: 2.4
     """
     def __init__(self, message, cause=None):
         super(CausedByException, self).__init__(message)
@@ -124,6 +128,8 @@ def raise_with_cause(exc_cls, message, *args, **kwargs):
                  exceptions constructor.
     :param kwargs: any additional keyword arguments to pass to the
                    exceptions constructor.
+
+    .. versionadded:: 1.6
     """
     if 'cause' not in kwargs:
         exc_type, exc, exc_tb = sys.exc_info()
@@ -172,6 +178,9 @@ class save_and_reraise_exception(object):
               [if statements to determine whether to raise a new exception]
               # Not raising a new exception, so reraise
               ctxt.reraise = True
+
+    .. versionchanged:: 1.4
+       Added *logger* optional parameter.
     """
     def __init__(self, reraise=True, logger=None):
         self.reraise = reraise
@@ -195,32 +204,61 @@ class save_and_reraise_exception(object):
             six.reraise(self.type_, self.value, self.tb)
 
 
-def forever_retry_uncaught_exceptions(infunc):
-    def inner_func(*args, **kwargs):
-        last_log_time = 0
-        last_exc_message = None
-        exc_count = 0
-        while True:
-            try:
-                return infunc(*args, **kwargs)
-            except Exception as exc:
-                this_exc_message = six.u(str(exc))
-                if this_exc_message == last_exc_message:
-                    exc_count += 1
-                else:
-                    exc_count = 1
-                # Do not log any more frequently than once a minute unless
-                # the exception message changes
-                cur_time = int(time.time())
-                if (cur_time - last_log_time > 60 or
-                        this_exc_message != last_exc_message):
-                    logging.exception(
-                        _LE('Unexpected exception occurred %d time(s)... '
-                            'retrying.') % exc_count)
-                    last_log_time = cur_time
-                    last_exc_message = this_exc_message
-                    exc_count = 0
-                # This should be a very rare event. In case it isn't, do
-                # a sleep.
-                time.sleep(1)
-    return inner_func
+def forever_retry_uncaught_exceptions(*args, **kwargs):
+    """Decorates provided function with infinite retry behavior.
+
+    The function retry delay is **always** one second unless
+    keyword argument ``retry_delay`` is passed that defines a value different
+    than 1.0 (less than zero values are automatically changed to be 0.0).
+
+    If repeated exceptions with the same message occur, logging will only
+    output/get triggered for those equivalent messages every 60.0
+    seconds, this can be altered by keyword argument ``same_log_delay`` to
+    be a value different than 60.0 seconds (exceptions that change the
+    message are always logged no matter what this delay is set to). As in
+    the ``retry_delay`` case if this is less than zero, it will be
+    automatically changed to be 0.0.
+    """
+
+    def decorator(infunc):
+        retry_delay = max(0.0, float(kwargs.get('retry_delay', 1.0)))
+        same_log_delay = max(0.0, float(kwargs.get('same_log_delay', 60.0)))
+
+        @six.wraps(infunc)
+        def wrapper(*args, **kwargs):
+            last_exc_message = None
+            same_failure_count = 0
+            watch = timeutils.StopWatch(duration=same_log_delay)
+            while True:
+                try:
+                    return infunc(*args, **kwargs)
+                except Exception as exc:
+                    this_exc_message = encodeutils.exception_to_unicode(exc)
+                    if this_exc_message == last_exc_message:
+                        same_failure_count += 1
+                    else:
+                        same_failure_count = 1
+                    if this_exc_message != last_exc_message or watch.expired():
+                        # The watch has expired or the exception message
+                        # changed, so time to log it again...
+                        logging.exception(
+                            _LE('Unexpected exception occurred %d time(s)... '
+                                'retrying.') % same_failure_count)
+                        if not watch.has_started():
+                            watch.start()
+                        else:
+                            watch.restart()
+                        same_failure_count = 0
+                        last_exc_message = this_exc_message
+                    time.sleep(retry_delay)
+        return wrapper
+
+    # This is needed to handle when the decorator has args or the decorator
+    # doesn't have args, python is rather weird here...
+    if kwargs or not args:
+        return decorator
+    else:
+        if len(args) == 1:
+            return decorator(args[0])
+        else:
+            return decorator

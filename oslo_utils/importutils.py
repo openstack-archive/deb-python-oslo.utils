@@ -22,7 +22,10 @@ import traceback
 
 
 def import_class(import_str):
-    """Returns a class from a string including module and class."""
+    """Returns a class from a string including module and class.
+
+    .. versionadded:: 0.3
+    """
     mod_str, _sep, class_str = import_str.rpartition('.')
     __import__(mod_str)
     try:
@@ -34,7 +37,10 @@ def import_class(import_str):
 
 
 def import_object(import_str, *args, **kwargs):
-    """Import a class and return an instance of it."""
+    """Import a class and return an instance of it.
+
+    .. versionadded:: 0.3
+    """
     return import_class(import_str)(*args, **kwargs)
 
 
@@ -44,21 +50,35 @@ def import_object_ns(name_space, import_str, *args, **kwargs):
     Imports a class and return an instance of it, first by trying
     to find the class in a default namespace, then failing back to
     a full path if not found in the default namespace.
+
+    .. versionadded:: 0.3
+
+    .. versionchanged:: 2.6
+       Don't capture :exc:`ImportError` when instanciating the object, only
+       when importing the object class.
     """
     import_value = "%s.%s" % (name_space, import_str)
     try:
-        return import_class(import_value)(*args, **kwargs)
+        cls = import_class(import_value)
     except ImportError:
-        return import_class(import_str)(*args, **kwargs)
+        cls = import_class(import_str)
+    return cls(*args, **kwargs)
 
 
 def import_module(import_str):
-    """Import a module."""
+    """Import a module.
+
+    .. versionadded:: 0.3
+    """
     __import__(import_str)
     return sys.modules[import_str]
 
 
 def import_versioned_module(version, submodule=None):
+    """Import a versioned module.
+
+    .. versionadded:: 0.3
+    """
     module = 'oslo.v%s' % version
     if submodule:
         module = '.'.join((module, submodule))
