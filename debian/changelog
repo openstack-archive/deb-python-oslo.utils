@@ -1,3 +1,9 @@
+python-oslo.utils (3.3.0-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+
+ -- David Della Vecchia <ddv@canonical.com>  Wed, 06 Jan 2016 09:26:13 -0500
+
 python-oslo.utils (3.0.0-1) experimental; urgency=medium
 
   * New upstream release.
