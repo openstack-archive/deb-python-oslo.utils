@@ -6,8 +6,9 @@ python-oslo.utils (3.3.0-1) UNRELEASED; urgency=medium
 
   [ Corey Bryant ]
   * d/control: Add python3-funcsigs to (build-)depends.
+  * d/rules: Run tests for all py3 versions.
 
- -- Corey Bryant <corey.bryant@canonical.com>  Fri, 08 Jan 2016 12:55:11 -0500
+ -- Corey Bryant <corey.bryant@canonical.com>  Fri, 08 Jan 2016 12:56:27 -0500
 
 python-oslo.utils (3.0.0-1) experimental; urgency=medium
 
