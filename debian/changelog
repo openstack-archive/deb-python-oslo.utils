@@ -1,9 +1,13 @@
 python-oslo.utils (3.3.0-1) UNRELEASED; urgency=medium
 
+  [ David Della Vecchia ]
   * New upstream release.
   * d/control: Align requirements with upstream.
 
- -- David Della Vecchia <ddv@canonical.com>  Wed, 06 Jan 2016 09:26:13 -0500
+  [ Corey Bryant ]
+  * d/control: Add python3-funcsigs to (build-)depends.
+
+ -- Corey Bryant <corey.bryant@canonical.com>  Fri, 08 Jan 2016 12:55:11 -0500
 
 python-oslo.utils (3.0.0-1) experimental; urgency=medium
 
