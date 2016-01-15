@@ -53,7 +53,7 @@ SLUGIFY_HYPHENATE_RE = re.compile(r"[-\s]+")
 # NOTE(flaper87): The following globals are used by `mask_password`
 _SANITIZE_KEYS = ['adminPass', 'admin_pass', 'password', 'admin_password',
                   'auth_token', 'new_pass', 'auth_password', 'secret_uuid',
-                  'secret', 'sys_pswd', 'token']
+                  'secret', 'sys_pswd', 'token', 'configdrive']
 
 # NOTE(ldbragst): Let's build a list of regex objects using the list of
 # _SANITIZE_KEYS we already have. This way, we only have to add the new key
@@ -285,6 +285,79 @@ def mask_password(message, secret="***"):  # nosec
                 message = re.sub(pattern, substitute1, message)
 
     return message
+
+
+def mask_dict_password(dictionary, secret="***"):  # nosec
+    """Replace password with *secret* in a dictionary recursively.
+
+    :param dictionary: The dictionary which includes secret information.
+    :param secret: value with which to replace secret information.
+    :returns: The dictionary with string substitutions.
+
+    A dictionary (which may contain nested dictionaries) contains
+    information (such as passwords) which should not be revealed, and
+    this function helps detect and replace those with the 'secret'
+    provided (or '***' if none is provided).
+
+    Substitution is performed in one of three situations:
+
+    If the key is something that is considered to be indicative of a
+    secret, then the corresponding value is replaced with the secret
+    provided (or '***' if none is provided).
+
+    If a value in the dictionary is a string, then it is masked
+    using the mask_password() function.
+
+    Finally, if a value is a dictionary, this function will
+    recursively mask that dictionary as well.
+
+    For example:
+
+    >>> mask_dict_password({'password': 'd81juxmEW_',
+    >>>                     'user': 'admin',
+    >>>                     'home-dir': '/home/admin'},
+    >>>                     '???')
+    {'password': '???', 'user': 'admin', 'home-dir': '/home/admin'}
+
+    For example (the value is masked using mask_password())
+
+    >>> mask_dict_password({'password': '--password d81juxmEW_',
+    >>>                     'user': 'admin',
+    >>>                     'home-dir': '/home/admin'},
+    >>>                     '???')
+    {'password': '--password ???', 'user': 'admin',
+     'home-dir': '/home/admin'}
+
+
+    For example (a nested dictionary is masked):
+
+    >>> mask_dict_password({"nested": {'password': 'd81juxmEW_',
+    >>>                     'user': 'admin',
+    >>>                     'home': '/home/admin'}},
+    >>>                     '???')
+    {"nested": {'password': '???', 'user': 'admin', 'home': '/home/admin'}}
+
+    .. versionadded:: 3.4
+
+    """
+
+    if not isinstance(dictionary, dict):
+        raise TypeError("Expected a dictionary, got %s instead."
+                        % type(dictionary))
+
+    out = {}
+
+    for k, v in dictionary.items():
+        if isinstance(v, dict):
+            v = mask_dict_password(v, secret=secret)
+        elif k in _SANITIZE_KEYS:
+            v = secret
+        elif isinstance(v, six.string_types):
+            v = mask_password(v, secret=secret)
+
+        out[k] = v
+
+    return out
 
 
 def is_int_like(val):
