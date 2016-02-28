@@ -55,7 +55,7 @@ Build-Depends-Indep: bandit,
 Standards-Version: 3.9.6
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=openstack/python-oslo.utils.git
 Vcs-Git: git://anonscm.debian.org/openstack/python-oslo.utils.git
-Homepage: http://launchpad.net/oslo
+Homepage: https://launchpad.net/oslo
 
 Package: python-oslo.utils
 Architecture: all
