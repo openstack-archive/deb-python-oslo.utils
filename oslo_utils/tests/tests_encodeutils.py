@@ -106,6 +106,20 @@ class EncodeUtilsTest(test_base.BaseTestCase):
         self.assertNotEqual(text, result)
         self.assertNotEqual(six.b("foo\xf1bar"), result)
 
+    def test_to_utf8(self):
+        self.assertEqual(encodeutils.to_utf8(b'a\xe9\xff'),        # bytes
+                         b'a\xe9\xff')
+        self.assertEqual(encodeutils.to_utf8(u'a\xe9\xff\u20ac'),  # Unicode
+                         b'a\xc3\xa9\xc3\xbf\xe2\x82\xac')
+        self.assertRaises(TypeError, encodeutils.to_utf8, 123)     # invalid
+
+        # oslo.i18n Message objects should also be accepted for convenience.
+        # It works because Message is a subclass of six.text_type. Use the
+        # lazy translation to get a Message instance of oslo_i18n.
+        msg = oslo_i18n.fixture.Translation().lazy("test")
+        self.assertEqual(encodeutils.to_utf8(msg),
+                         b'test')
+
 
 class ExceptionToUnicodeTest(test_base.BaseTestCase):
 
@@ -136,7 +150,8 @@ class ExceptionToUnicodeTest(test_base.BaseTestCase):
                          u'utf-8 \xe9\u20ac')
 
         # Force the locale encoding to ASCII to test the fallback
-        with mock.patch('sys.getfilesystemencoding', return_value='ascii'):
+        with mock.patch.object(encodeutils, '_getfilesystemencoding',
+                               return_value='ascii'):
             # Fallback: decode from ISO-8859-1
             exc = StrException(b'rawbytes \x80\xff')
             self.assertEqual(encodeutils.exception_to_unicode(exc),
@@ -153,7 +168,8 @@ class ExceptionToUnicodeTest(test_base.BaseTestCase):
                          u'unicode \xe9\u20ac')
 
         # Test the locale encoding
-        with mock.patch('sys.getfilesystemencoding', return_value='koi8_r'):
+        with mock.patch.object(encodeutils, '_getfilesystemencoding',
+                               return_value='koi8_r'):
             exc = StrException(b'\xf2\xd5\xd3\xd3\xcb\xc9\xca')
             # Decode from the locale encoding
             # (the message cannot be decoded from ASCII nor UTF-8)

@@ -18,6 +18,12 @@ import sys
 import six
 
 
+# NOTE(blk-u): This provides a symbol that can be overridden just for this
+# module during testing. sys.getfilesystemencoding() is called by coverage so
+# mocking it globally caused the coverage job to fail.
+_getfilesystemencoding = sys.getfilesystemencoding
+
+
 def safe_decode(text, incoming=None, errors='strict'):
     """Decodes incoming text/bytes string using `incoming` if they're not
        already unicode.
@@ -71,6 +77,9 @@ def safe_encode(text, incoming=None,
     :returns: text or a bytestring `encoding` encoded
                 representation of it.
     :raises TypeError: If text is not an instance of str
+
+    See also to_utf8() function which is simpler and don't depend on
+    the locale encoding.
     """
     if not isinstance(text, (six.string_types, six.binary_type)):
         raise TypeError("%s can't be encoded" % type(text))
@@ -93,6 +102,22 @@ def safe_encode(text, incoming=None,
         return text.encode(encoding, errors)
     else:
         return text
+
+
+def to_utf8(text):
+    """Encode Unicode to UTF-8, return bytes unchanged.
+
+    Raise TypeError if text is not a bytes string or a Unicode string.
+
+    .. versionadded:: 3.5
+    """
+    if isinstance(text, bytes):
+        return text
+    elif isinstance(text, six.text_type):
+        return text.encode('utf-8')
+    else:
+        raise TypeError("bytes or Unicode expected, got %s"
+                        % type(text).__name__)
 
 
 def exception_to_unicode(exc):
@@ -150,7 +175,7 @@ def exception_to_unicode(exc):
 
     # Try the locale encoding, most error messages are encoded to this encoding
     # (ex: os.strerror(errno))
-    encoding = sys.getfilesystemencoding()
+    encoding = _getfilesystemencoding()
     try:
         return msg.decode(encoding)
     except UnicodeDecodeError:  # nosec

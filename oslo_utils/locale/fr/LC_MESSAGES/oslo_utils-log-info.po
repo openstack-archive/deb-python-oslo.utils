@@ -3,37 +3,39 @@
 # This file is distributed under the same license as the oslo.utils project.
 #
 # Translators:
-# Andreas Jaeger <jaegerandi@gmail.com>, 2014
+# Maxime COQUEREL <max.coquerel@gmail.com>, 2014-2015
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: oslo.utils 2.6.1.dev7\n"
+"Project-Id-Version: oslo.utils 3.4.1.dev1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-10-23 06:32+0000\n"
-"PO-Revision-Date: 2014-12-07 06:44+0000\n"
-"Last-Translator: Andreas Jaeger <jaegerandi@gmail.com>\n"
-"Language-Team: German\n"
-"Language: de\n"
+"POT-Creation-Date: 2016-01-16 07:58+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"PO-Revision-Date: 2015-03-08 04:45+0000\n"
+"Last-Translator: Maxime COQUEREL <max.coquerel@gmail.com>\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "Generated-By: Babel 2.0\n"
-"X-Generator: Zanata 3.7.1\n"
+"X-Generator: Zanata 3.7.3\n"
+"Language-Team: French\n"
 
 #, python-format
 msgid "Could not determine IPv4 address for interface %(interface)s: %(error)s"
 msgstr ""
-"Konnte IPv4 Adresse für Interface %(interface)s nicht bestimmen: %(error)s"
+"Impossible de déterminer l'adresse IPv4 utilisé par l'interface "
+"%(interface)s: %(error)s"
 
 #, python-format
 msgid "Could not determine IPv4 address for interface %s, using 127.0.0.1"
 msgstr ""
-"Konnte IPv4  Adresse für Interface %s nicht bestimmen, verwende 127.0.0.1"
+"Impossible de déterminer l'adresse IPv4 utilisé par l'interface %s pour "
+"l'adresse 127.0.0.1"
 
 msgid ""
 "Could not determine default network interface, using 127.0.0.1 for IPv4 "
 "address"
 msgstr ""
-"Konnte default Network Interface nicht bestimmen, 127.0.0.1 wird als IPv4 "
-"Adresse benutzt."
+"Impossible de déterminer l'interface de réseau par défaut, utilisé pour "
+"l'adresse IPv4 127.0.0.1"
