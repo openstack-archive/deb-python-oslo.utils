@@ -2,6 +2,7 @@ python-oslo.utils (3.7.0-1) experimental; urgency=medium
 
   [ Thomas Goirand ]
   * Fixed minimum version of python{3,}-netifaces to 0.10.4.
+  * Standards-Version: 3.9.7 (no change).
 
   [ Ondřej Nový ]
   * Fixed homepage (https).
@@ -12,7 +13,7 @@ python-oslo.utils (3.7.0-1) experimental; urgency=medium
   * d/control: Align (Build-)Depends with upstream.
   * d/p/allow-any-pytz-version.patch: Rebased.
 
- -- Corey Bryant <corey.bryant@canonical.com>  Tue, 01 Mar 2016 08:29:44 -0500
+ -- Thomas Goirand <zigo@debian.org>  Wed, 02 Mar 2016 10:22:30 +0000
 
 python-oslo.utils (3.4.0-1) experimental; urgency=medium
 
