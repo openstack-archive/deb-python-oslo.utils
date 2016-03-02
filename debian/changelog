@@ -1,4 +1,4 @@
-python-oslo.utils (3.7.0-1) UNRELEASED; urgency=medium
+python-oslo.utils (3.7.0-1) experimental; urgency=medium
 
   [ Thomas Goirand ]
   * Fixed minimum version of python{3,}-netifaces to 0.10.4.
