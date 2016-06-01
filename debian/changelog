@@ -1,4 +1,4 @@
-python-oslo.utils (3.10.0-1) UNRELEASED; urgency=medium
+python-oslo.utils (3.11.0-1) UNRELEASED; urgency=medium
 
   [ Ondřej Nový ]
   * Standards-Version is 3.9.8 now (no change)
@@ -11,7 +11,7 @@ python-oslo.utils (3.10.0-1) UNRELEASED; urgency=medium
   * d/control: Align (Build-)Depends with upstream.
   * d/p/allow-any-pytz-version.patch: Rebased.
 
- -- Corey Bryant <corey.bryant@canonical.com>  Mon, 23 May 2016 16:39:16 -0400
+ -- Corey Bryant <corey.bryant@canonical.com>  Wed, 01 Jun 2016 10:41:17 -0400
 
 python-oslo.utils (3.8.0-2) unstable; urgency=medium
 
