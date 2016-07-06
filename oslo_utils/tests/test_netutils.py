@@ -17,7 +17,6 @@ import contextlib
 import socket
 
 import mock
-from mock import patch
 import netifaces
 from oslotest import base as test_base
 import six
@@ -190,15 +189,16 @@ class NetworkUtilsTest(test_base.BaseTestCase):
 
         self.assertFalse(netutils.is_valid_cidr('10.0.0.1'))
         self.assertFalse(netutils.is_valid_cidr('10.0.0.1/33'))
+        self.assertFalse(netutils.is_valid_cidr(10))
 
     def test_valid_port(self):
-        valid_inputs = [1, '1', 2, '3', '5', 8, 13, 21,
+        valid_inputs = [0, '0', 1, '1', 2, '3', '5', 8, 13, 21,
                         '80', '3246', '65535']
         for input_str in valid_inputs:
             self.assertTrue(netutils.is_valid_port(input_str))
 
     def test_valid_port_fail(self):
-        invalid_inputs = ['-32768', '0', 0, '65536', 528491, '528491',
+        invalid_inputs = ['-32768', '65536', 528491, '528491',
                           '528.491', 'thirty-seven', None]
         for input_str in invalid_inputs:
             self.assertFalse(netutils.is_valid_port(input_str))
@@ -260,7 +260,7 @@ class NetworkUtilsTest(test_base.BaseTestCase):
     @mock.patch('netifaces.ifaddresses')
     def test_get_my_ipv4_address_with_default_route(
             self, ifaddr, gateways):
-        with patch.dict(netifaces.__dict__, {'AF_INET': '0'}):
+        with mock.patch.dict(netifaces.__dict__, {'AF_INET': '0'}):
             ifaddr.return_value = {'0': [{'addr': '172.18.204.1'}]}
             addr = netutils._get_my_ipv4_address()
         self.assertEqual('172.18.204.1', addr)
@@ -269,7 +269,7 @@ class NetworkUtilsTest(test_base.BaseTestCase):
     @mock.patch('netifaces.ifaddresses')
     def test_get_my_ipv4_address_without_default_route(
             self, ifaddr, gateways):
-        with patch.dict(netifaces.__dict__, {'AF_INET': '0'}):
+        with mock.patch.dict(netifaces.__dict__, {'AF_INET': '0'}):
             ifaddr.return_value = {}
             addr = netutils._get_my_ipv4_address()
         self.assertEqual('127.0.0.1', addr)
@@ -314,6 +314,12 @@ class IPv6byEUI64TestCase(test_base.BaseTestCase):
         mac = '00:16:3e:33:44:55'
         prefix = 123
         self.assertRaises(TypeError, lambda:
+                          netutils.get_ipv6_addr_by_EUI64(prefix, mac))
+
+    def test_generate_IPv6_with_empty_prefix(self):
+        mac = '00:16:3e:33:44:55'
+        prefix = ''
+        self.assertRaises(ValueError, lambda:
                           netutils.get_ipv6_addr_by_EUI64(prefix, mac))
 
 

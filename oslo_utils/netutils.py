@@ -92,7 +92,7 @@ def is_valid_ipv4(address):
     """
     try:
         return netaddr.valid_ipv4(address)
-    except Exception:
+    except netaddr.AddrFormatError:
         return False
 
 
@@ -107,7 +107,7 @@ def is_valid_ipv6(address):
     """
     try:
         return netaddr.valid_ipv6(address)
-    except Exception:
+    except netaddr.AddrFormatError:
         return False
 
 
@@ -123,7 +123,7 @@ def is_valid_cidr(address):
     try:
         # Validate the correct CIDR Address
         netaddr.IPNetwork(address)
-    except netaddr.AddrFormatError:
+    except (TypeError, netaddr.AddrFormatError):
         return False
 
     # Prior validation partially verify /xx part
@@ -151,7 +151,7 @@ def get_ipv6_addr_by_EUI64(prefix, mac):
     .. versionadded:: 1.4
     """
     # Check if the prefix is an IPv4 address
-    if netaddr.valid_ipv4(prefix):
+    if is_valid_ipv4(prefix):
         msg = _("Unable to generate IP address by EUI64 for IPv4 prefix")
         raise ValueError(msg)
     try:
@@ -222,12 +222,12 @@ def _is_int_in_range(value, start, end):
 def is_valid_port(port):
     """Verify that port represents a valid port number.
 
-    Port can be valid integer having a value of 1 up to and
+    Port can be valid integer having a value of 0 up to and
     including 65535.
 
     .. versionadded:: 1.1.1
     """
-    return _is_int_in_range(port, 1, 65535)
+    return _is_int_in_range(port, 0, 65535)
 
 
 def is_valid_icmp_type(type):
