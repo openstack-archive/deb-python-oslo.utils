@@ -6,6 +6,7 @@ python-oslo.utils (3.15.0-1) experimental; urgency=medium
 
   [ Thomas Goirand ]
   * New upstream release.
+  * Drop transition packages useless since Xenial is out.
 
  -- Thomas Goirand <zigo@debian.org>  Tue, 12 Jul 2016 14:14:47 +0000
 
