@@ -1,0 +1,8 @@
+Code-Review+2: Alexis Lee <lxsli@hpe.com>
+Workflow+1: Alexis Lee <lxsli@hpe.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 27 Sep 2016 12:00:57 +0000
+Reviewed-on: https://review.openstack.org/377542
+Project: openstack/deb-python-oslo.utils
+Branch: refs/heads/master
