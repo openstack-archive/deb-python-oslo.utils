@@ -1,0 +1,10 @@
+Code-Review+2: Alexis Lee <lxsli@hpe.com>
+Code-Review+1: John L. Villalovos <openstack.org@sodarock.com>
+Code-Review+2: Ben Nemec <openstack@nemebean.com>
+Workflow+1: Ben Nemec <openstack@nemebean.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Thu, 29 Sep 2016 16:02:41 +0000
+Reviewed-on: https://review.openstack.org/376206
+Project: openstack/deb-python-oslo.utils
+Branch: refs/heads/master
