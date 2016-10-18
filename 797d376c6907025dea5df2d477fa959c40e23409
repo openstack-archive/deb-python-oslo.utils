@@ -1,0 +1,9 @@
+Code-Review+2: Joshua Harlow <jxharlow@godaddy.com>
+Code-Review+2: ChangBo Guo(gcb) <glongwave@gmail.com>
+Workflow+1: ChangBo Guo(gcb) <glongwave@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 18 Oct 2016 05:21:42 +0000
+Reviewed-on: https://review.openstack.org/387102
+Project: openstack/deb-python-oslo.utils
+Branch: refs/heads/master
