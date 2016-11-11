@@ -1,0 +1,9 @@
+Code-Review+2: Gevorg Davoian <gdavoian@mirantis.com>
+Code-Review+2: Alexis Lee <lxsli@hpe.com>
+Workflow+1: Alexis Lee <lxsli@hpe.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Fri, 11 Nov 2016 02:40:18 +0000
+Reviewed-on: https://review.openstack.org/395357
+Project: openstack/deb-python-oslo.utils
+Branch: refs/heads/master
