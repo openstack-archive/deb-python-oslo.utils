@@ -1,0 +1,8 @@
+Code-Review+2: Doug Hellmann <doug@doughellmann.com>
+Workflow+1: Doug Hellmann <doug@doughellmann.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 12 Jul 2017 19:56:38 +0000
+Reviewed-on: https://review.openstack.org/483013
+Project: openstack/deb-python-oslo.utils
+Branch: refs/heads/master
