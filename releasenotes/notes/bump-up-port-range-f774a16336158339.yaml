@@ -1,3 +1,0 @@
----
-fixes:
-  - Expanded range of allowed ports by adding 0 to valid number.
